@@ -1,0 +1,18 @@
+<fieldset [formGroup]="orgList" style="display: inline-block; width:45%; ">
+  Загруженные значения: <button (click)="addNewItems()">Догрузить</button>
+  <ul >
+    <li *ngFor="let item of items; let i = index"> 
+      {{item.name}}
+      <button (click)="toStar(i)"><span *ngIf="!item.is_star">В избранное</span><span *ngIf="item.is_star" style="background-color: lightgray;">В обычное</span></button>
+    </li>
+  </ul>
+</fieldset>
+
+<fieldset [formGroup]="orgList" style="display: inline-block; width:45%; ">
+  Список избранного из загруженных
+  <ul >
+    <li *ngFor="let item of itemsFav; let i = index"> 
+      {{item.name}}
+    </li>
+  </ul>
+</fieldset>
