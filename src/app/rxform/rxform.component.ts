@@ -16,12 +16,15 @@ export class Simple {
 })
 export class RxformComponent implements OnInit {
 
-  orgList : FormGroup;
-  addItemsButton : FormControl;
-  offset : number = 0;
-  items : Simple[] = [];
-  itemsFav : Simple[] = [];
-  favs : number[] = [];
+  orgList: FormGroup;
+  addItemsButton: FormControl;
+  offset: number = 0;
+  items: Simple[] = [];
+  /* itemsFav: Simple[] = []; */
+  favs: number[] = [];
+  favsList: string[] = []; 
+  showList: boolean = false;
+  showFavorites: boolean = false;
   private pagesize : number = 10;
   private lastId : number = 0;
 
@@ -30,7 +33,8 @@ export class RxformComponent implements OnInit {
   }
 
   ngOnInit() {
-    if(sessionStorage.getItem('favs')) this.favs = (sessionStorage.getItem('favs').split(',')).map(parseFloat);
+    if(localStorage.getItem('favs')) this.favs = (localStorage.getItem('favs').split(',')).map(parseFloat);
+    if(localStorage.getItem('favsList')) this.favsList = (localStorage.getItem('favsList').split(','));
 
     this.getItems().subscribe( t  => {this.addItems(t);});
     this.orgList = new FormGroup({});
@@ -42,7 +46,7 @@ export class RxformComponent implements OnInit {
 
   addNewItems(){
     this.offset+=this.pagesize;
-    this.getItems().subscribe( t  => {this.addItems(t); console.log(this.items)});
+    this.getItems().subscribe( t  => {this.addItems(t);});
   }
 
   private addItems(newItems){
@@ -52,27 +56,25 @@ export class RxformComponent implements OnInit {
         item.id = this.lastId++;
         item.name = newItems.result[i];
         this.favs.find(u => u == item.id) ? item.is_star = true :  item.is_star = false;
-        if (item.is_star == true) this.itemsFav.push( item );
         this.items.push( item ); 
       }
     }
   }
 
   toStar(num: number){
-    let temp = this.itemsFav;
-    this.itemsFav = [];
     this.items[num].is_star = !this.items[num].is_star;
     if (this.items[num].is_star) {
-      this.favs.push(num);
-      temp.push(this.items[num]);
+      this.favs.push(this.items[num].id);
+      this.favsList.push(this.items[num].name);
     } else {
       const index = this.favs.indexOf(num);
-      if (index !== -1) this.favs.splice(index, 1);
-      const indexX = temp.indexOf(this.items[num]);
-      if (indexX !== -1) temp.splice(indexX, 1);
+      if (index !== -1) {
+        this.favs.splice(index, 1);
+        this.favsList.splice(index, 1);
+      }
     }
-    this.itemsFav = temp;
-    sessionStorage.setItem('favs', this.favs.join(','));
+    localStorage.setItem('favs', this.favs.join(','));
+    localStorage.setItem('favsList', this.favsList.join(','));
   }
 
 }
