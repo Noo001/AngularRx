@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormGroup, FormControl, FormArray, Validators} from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 export class Simple {
   id: number;
@@ -14,29 +14,27 @@ export class Simple {
   templateUrl: './rxform.component.html',
   styleUrls: ['./rxform.component.scss']
 })
-export class RxformComponent implements OnInit {
+export class RxformComponent implements OnInit, OnDestroy {
 
   orgList: FormGroup;
   addItemsButton: FormControl;
   offset: number = 0;
   items: Simple[] = [];
-  /* itemsFav: Simple[] = []; */
   favs: number[] = [];
   favsList: string[] = []; 
   showList: boolean = false;
   showFavorites: boolean = false;
   private pagesize : number = 10;
   private lastId : number = 0;
+  private subscriptions: Subscription[] = [];
 
-  constructor(private http: HttpClient) { 
-    
-  }
+  constructor(private http: HttpClient) {}
 
   ngOnInit() {
     if(localStorage.getItem('favs')) this.favs = (localStorage.getItem('favs').split(',')).map(parseFloat);
     if(localStorage.getItem('favsList')) this.favsList = (localStorage.getItem('favsList').split(','));
 
-    this.getItems().subscribe( t  => {this.addItems(t);});
+    this.subscriptions.push(this.getItems().subscribe( t  => {this.addItems(t);}));
     this.orgList = new FormGroup({});
   }
 
@@ -46,7 +44,7 @@ export class RxformComponent implements OnInit {
 
   addNewItems(){
     this.offset+=this.pagesize;
-    this.getItems().subscribe( t  => {this.addItems(t);});
+    this.subscriptions.push(this.getItems().subscribe( t  => {this.addItems(t);}));
   }
 
   private addItems(newItems){
@@ -65,7 +63,9 @@ export class RxformComponent implements OnInit {
     this.items[num].is_star = !this.items[num].is_star;
     if (this.items[num].is_star) {
       this.favs.push(this.items[num].id);
+      this.favs.sort();
       this.favsList.push(this.items[num].name);
+      this.favsList.sort();
     } else {
       const index = this.favs.indexOf(num);
       if (index !== -1) {
@@ -75,6 +75,10 @@ export class RxformComponent implements OnInit {
     }
     localStorage.setItem('favs', this.favs.join(','));
     localStorage.setItem('favsList', this.favsList.join(','));
+  }
+
+  ngOnDestroy(){
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
 }

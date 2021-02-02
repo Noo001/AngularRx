@@ -1,7 +1,7 @@
 <fieldset [formGroup]="orgList" style="display: inline-block; width:45%; ">
-  <button (click)="showList=!showList"><span *ngIf="!showList">Показать</span><span *ngIf="showList">Скрыть</span></button>
+  Загруженные значения <button (click)="showList=!showList"><span *ngIf="!showList">Показать</span><span *ngIf="showList">Скрыть</span></button>
   <div *ngIf="showList">
-    Загруженные значения: <button (click)="addNewItems()">Догрузить</button>
+    <button (click)="addNewItems()">Догрузить</button>
     <ul>
       <li *ngFor="let item of items; let i = index"> 
         {{item.name}}
@@ -12,9 +12,8 @@
 </fieldset>
 
 <fieldset [formGroup]="orgList" style="display: inline-block; width:45%; ">
-  <button (click)="showFavorites=!showFavorites"><span *ngIf="!showFavorites">Показать</span><span *ngIf="showFavorites">Скрыть</span></button>
+  Список избранного <button (click)="showFavorites=!showFavorites"><span *ngIf="!showFavorites">Показать</span><span *ngIf="showFavorites">Скрыть</span></button>
   <div *ngIf="showFavorites">
-    Список избранного
     <ul >
       <li *ngFor="let item of favsList; let i = index"> 
         {{item}}
